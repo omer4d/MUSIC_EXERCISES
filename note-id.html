@@ -1,0 +1,39 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="theme.css">
+	</head>
+
+	<body bgcolor="FFFFFF">
+	<h2 id="stats">0/0 (100%)</h2>
+	<svg id="staff" width="520px" height="360px" xmlns="http://www.w3.org/2000/svg">
+		<line x1="0" y1="80" x2="520" y2="80" style="stroke:black;stroke-width:1"/>
+		<line x1="0" y1="100" x2="520" y2="100" style="stroke:black;stroke-width:1"/>
+		<line x1="0" y1="120" x2="520" y2="120" style="stroke:black;stroke-width:1"/>
+		<line x1="0" y1="140" x2="520" y2="140" style="stroke:black;stroke-width:1"/>
+		<line x1="0" y1="160" x2="520" y2="160" style="stroke:black;stroke-width:1"/>
+		
+		<line x1="0" y1="200" x2="520" y2="200" style="stroke:black;stroke-width:1"/>
+		<line x1="0" y1="220" x2="520" y2="220" style="stroke:black;stroke-width:1"/>
+		<line x1="0" y1="240" x2="520" y2="240" style="stroke:black;stroke-width:1"/>
+		<line x1="0" y1="260" x2="520" y2="260" style="stroke:black;stroke-width:1"/>
+		<line x1="0" y1="280" x2="520" y2="280" style="stroke:black;stroke-width:1"/>
+		
+		<image xlink:href="g-clef.svg" x="5" y="49"/>
+		<image xlink:href="f-clef.svg" x="5" y="199"/>
+	</svg>
+	<br/>
+	<table width="520px" height="50px">
+		<tr>
+			<td><button type="button" class="btn-answer" value="C" onclick="handleAnswer(event)">C</button></td>
+			<td><button type="button" class="btn-answer" value="D" onclick="handleAnswer(event)">D</button></td>
+			<td><button type="button" class="btn-answer" value="E" onclick="handleAnswer(event)">E</button></td>
+			<td><button type="button" class="btn-answer" value="F" onclick="handleAnswer(event)">F</button></td>
+			<td><button type="button" class="btn-answer" value="G" onclick="handleAnswer(event)">G</button></td>
+			<td><button type="button" class="btn-answer" value="A" onclick="handleAnswer(event)">A</button></td>
+			<td><button type="button" class="btn-answer" value="B" onclick="handleAnswer(event)">B</button></td>
+		</tr>
+	</table>
+	
+	<script src="note-id.js"></script>
+	</body>
+</html>

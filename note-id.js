@@ -1,51 +1,3 @@
-function dupdate(obj, keys, f) {
-  var curr = obj;
-  for(var i = 0; i < keys.length - 1; ++i) {
-    if(!(keys[i] in curr)) {
-      curr[keys[i]] = {};
-    }
-    curr = curr[keys[i]];
-  }
-  curr[keys[keys.length - 1]] = f(curr[keys[keys.length - 1]]);
-  return obj;
-}
-
-function dget(obj, keys, def) {
-  for(var i = 0; i < keys.length; ++i) {
-    if(keys[i] in obj)
-      obj = obj[keys[i]];
-    else
-      return def;
-  }
-  return obj;
-}
-
-function dset(obj, keys, val) {
-  return dupdate(obj, keys, function(x) {
-    return val;
-  });
-}
-
-function dinc(obj, keys, x) {
-  return dupdate(obj, keys, function(y) {
-    return y ? (x + y) : x;
-  });
-}
-
-function randi(min, max) {
-	return Math.floor(min + Math.random() * (max - min));
-}
-
-function wrand(weights, items) {
-  var sum = weights.reduce(function(accum, x) {
-    return accum + x;
-  }, 0);
-  
-  var i, r = Math.random() * sum;
-  for(i = 0; i < weights.length && r >= 0; r -= weights[i], ++i);
-  return items[i - 1];
-}
-
 function makeLine(x1, y1, x2, y2, color, w) {
     var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     line.setAttribute('x1', x1);
@@ -103,10 +55,16 @@ function makeNote(idx) {
 	return g;
 }
 
+var expool = [];
+for(var i = notes.indexOf("C6"); i < notes.indexOf("C2"); ++i)
+	expool.push({graphic: makeNote(i), id: notes[i], answer: notes[i].charAt(0)});
+var exgen = new ExerciseGenerator(expool);
+
 function makeExercise() {
-	var idx = randi(notes.indexOf("C6"), notes.indexOf("C2"));
+	//var idx = randi(notes.indexOf("C6"), notes.indexOf("C2"));
 	//var idx = randi(notes.indexOf("C4"), notes.indexOf("C5"));
-	return {graphic: makeNote(idx), name: notes[idx], answer: notes[idx].charAt(0)};
+	//return {graphic: makeNote(idx), name: notes[idx], answer: notes[idx].charAt(0)};
+	return exgen.get();
 }
 
 function makecol(col) {
@@ -150,14 +108,20 @@ function colorize(target, col) {
 	target.colorizeAnimation = id;
 }
 
-var lastExerciseName = "00";
+var globalStartTime = performance.now();
 var exercise = makeExercise();
 var totalCount = 0, correctCount = 0;
 var exerciseStartTime = new Date().getTime();
 
-var noteStats = {};
-
-
+setInterval(function() {
+	var secs = Math.floor((performance.now() - globalStartTime) / 1000);
+	var fmt = function(x) {
+		x = Math.floor(x);
+		return x < 10 ? "0" + x : "" + x;
+	}
+	
+	document.getElementById("timer").textContent = fmt(secs / 60) + ":" + fmt(secs % 60);
+}, 1000);
 
 document.getElementById("staff").appendChild(exercise.graphic);
 
@@ -165,35 +129,20 @@ function handleAnswer(event) {
 	var currTime = new Date().getTime();
 	
 	++totalCount;
-	dinc(noteStats, [exercise.name, "total"], 1);
 	
 	if(event.target.value === exercise.answer) {
 		colorize(event.target, [160, 255, 160]);
 		++correctCount;
-		dinc(noteStats, [exercise.name, "right"], 1);
 	}else {
 		colorize(event.target, [255, 160, 160]);
 	}
 	
-	dinc(noteStats, [exercise.name, "time"], currTime - exerciseStartTime);
+	exgen.respond(event.target.value, (currTime - exerciseStartTime) / 1000);
 	
-	lastExerciseName = exercise.name;
 	exercise.graphic.remove();
 	exercise = makeExercise();
 	exerciseStartTime = currTime;
 	
 	document.getElementById("stats").textContent = correctCount + "/" + totalCount + " (" + Math.floor(correctCount / totalCount * 100) + "%)";
 	document.getElementById("staff").appendChild(exercise.graphic);
-	
-	console.log("-----------------------");
-	Object.keys(noteStats).forEach(function(key) {
-		var total = noteStats[key].total;
-		
-		if(total) {
-			console.log(key + " " + (dget(noteStats, [key, "right"], 0) / total) + ", "
-								+ (dget(noteStats, [key, "time"], 0) / 1000 /  total));
-		}
-	});
-	
-	//console.log(JSON.stringify(noteStats, null, 2));
 }

@@ -125,19 +125,27 @@ setInterval(function() {
 
 document.getElementById("staff").appendChild(exercise.graphic);
 
-function handleAnswer(event) {
+var timeout;
+
+function refreshTimeout() {
+	if(timeout)
+		clearTimeout(timeout);
+	timeout = setTimeout(function() {
+		handleResponseHelper("");
+	}, 1500);
+}
+
+refreshTimeout();
+
+function handleResponseHelper(answer) {
 	var currTime = new Date().getTime();
 	
 	++totalCount;
 	
-	if(event.target.value === exercise.answer) {
-		colorize(event.target, [160, 255, 160]);
+	if(answer === exercise.answer)
 		++correctCount;
-	}else {
-		colorize(event.target, [255, 160, 160]);
-	}
 	
-	exgen.respond(event.target.value, (currTime - exerciseStartTime) / 1000);
+	exgen.respond(answer, (currTime - exerciseStartTime) / 1000);
 	
 	exercise.graphic.remove();
 	exercise = makeExercise();
@@ -145,4 +153,15 @@ function handleAnswer(event) {
 	
 	document.getElementById("stats").textContent = correctCount + "/" + totalCount + " (" + Math.floor(correctCount / totalCount * 100) + "%)";
 	document.getElementById("staff").appendChild(exercise.graphic);
+	
+	refreshTimeout();
 }
+
+function handleAnswer(event) {
+	if(event.target.value === exercise.answer)
+		colorize(event.target, [160, 255, 160]);
+	else
+		colorize(event.target, [255, 160, 160]);
+	handleResponseHelper(event.target.value);
+}
+
